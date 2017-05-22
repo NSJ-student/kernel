@@ -1,0 +1,1 @@
+cmd_drivers/video/tegra/host/t124/nvhost-t124.o := arm-linux-gnueabihf-ld -EL    -r -o drivers/video/tegra/host/t124/nvhost-t124.o drivers/video/tegra/host/t124/t124.o ; scripts/mod/modpost drivers/video/tegra/host/t124/nvhost-t124.o

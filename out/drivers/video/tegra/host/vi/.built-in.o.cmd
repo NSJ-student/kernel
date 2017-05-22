@@ -1,0 +1,1 @@
+cmd_drivers/video/tegra/host/vi/built-in.o :=  arm-linux-gnueabihf-ld -EL    -r -o drivers/video/tegra/host/vi/built-in.o drivers/video/tegra/host/vi/vi_irq.o drivers/video/tegra/host/vi/tegra_vi.o ; scripts/mod/modpost drivers/video/tegra/host/vi/built-in.o

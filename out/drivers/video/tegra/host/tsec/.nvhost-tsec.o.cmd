@@ -1,0 +1,1 @@
+cmd_drivers/video/tegra/host/tsec/nvhost-tsec.o := arm-linux-gnueabihf-ld -EL    -r -o drivers/video/tegra/host/tsec/nvhost-tsec.o drivers/video/tegra/host/tsec/tsec.o ; scripts/mod/modpost drivers/video/tegra/host/tsec/nvhost-tsec.o

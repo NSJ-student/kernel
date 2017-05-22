@@ -1,0 +1,1 @@
+cmd_drivers/video/tegra/host/flcn/nvhost-flcn.o := arm-linux-gnueabihf-ld -EL    -r -o drivers/video/tegra/host/flcn/nvhost-flcn.o drivers/video/tegra/host/flcn/flcn.o ; scripts/mod/modpost drivers/video/tegra/host/flcn/nvhost-flcn.o

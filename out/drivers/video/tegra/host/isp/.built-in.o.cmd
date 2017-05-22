@@ -1,0 +1,1 @@
+cmd_drivers/video/tegra/host/isp/built-in.o :=  arm-linux-gnueabihf-ld -EL    -r -o drivers/video/tegra/host/isp/built-in.o drivers/video/tegra/host/isp/nvhost-isp.o ; scripts/mod/modpost drivers/video/tegra/host/isp/built-in.o
