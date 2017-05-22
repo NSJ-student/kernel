@@ -510,6 +510,7 @@ static void hdmi_state_machine_worker(struct work_struct *work)
  ************************************************************/
 void hdmi_state_machine_init(struct tegra_dc_hdmi_data *hdmi)
 {
+	pr_info("NSJ hdmi_state_machine_init\n");
 	work_state.hdmi = hdmi;
 	work_state.state = HDMI_STATE_INIT_FROM_BOOTLOADER;
 	work_state.pending_hpd_evt = 1;

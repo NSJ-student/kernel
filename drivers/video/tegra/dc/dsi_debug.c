@@ -244,7 +244,7 @@ static ssize_t read_panel_set(struct file *file, const char  *buf,
 	struct tegra_dc_dsi_data *dsi = s->private;
 	struct tegra_dc *dc = dsi->dc;
 
-	if (sscanf(buf, "%x %x %x", &dsi_data_id, &max_ret_payload_size, &panel_reg_addr) != 3)
+	if (sscanf(buf, "%x %x %x", (unsigned int *)&dsi_data_id, &max_ret_payload_size, &panel_reg_addr) != 3)
 		return -EINVAL;
 	dev_info(&dc->ndev->dev, "dsi_data_id=0x%x\nmax ret payload size:0x%x\npanel reg addr:0x%x\n",
 			dsi_data_id, max_ret_payload_size, panel_reg_addr);
