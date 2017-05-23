@@ -190,7 +190,7 @@ int tegra_edid_read_block(struct tegra_edid *edid, int block, u8 *data)
 }
 
 int tegra_edid_parse_ext_block(const u8 *raw, int idx,
-			       struct tegra_edid_pvt *edid)
+		struct tegra_edid_pvt *edid)
 {
 	const u8 *ptr;
 	u8 tmp;
@@ -242,91 +242,91 @@ int tegra_edid_parse_ext_block(const u8 *raw, int idx,
 		 */
 		code = (tmp >> 5) & 0x7;
 		switch (code) {
-		case 1:
-		{
-			int sad_n = edid->eld.sad_count * 3;
-			edid->eld.sad_count += len / 3;
-			pr_debug("%s: incrementing eld.sad_count by %d to %d\n",
-				 __func__, len / 3, edid->eld.sad_count);
-			edid->eld.conn_type = 0x00;
-			edid->eld.support_hdcp = 0x00;
-			for (i = 0; (i < len) && (sad_n < ELD_MAX_SAD_BYTES);
-			     i++, sad_n++)
-				edid->eld.sad[sad_n] = ptr[i + 1];
-			len++;
-			ptr += len; /* adding the header */
-			/* Got an audio data block so enable audio */
-			if (basic_audio == true)
-				edid->eld.spk_alloc = 1;
-			break;
-		}
-		/* case 2 is commented out for now */
-		case 3:
-		{
-			int j = 0;
-
-			if ((ptr[1] == 0x03) &&
-				(ptr[2] == 0x0c) &&
-				(ptr[3] == 0)) {
-				edid->eld.port_id[0] = ptr[4];
-				edid->eld.port_id[1] = ptr[5];
-			}
-			if ((len >= 8) &&
-				(ptr[1] == 0x03) &&
-				(ptr[2] == 0x0c) &&
-				(ptr[3] == 0)) {
-				j = 8;
-				tmp = ptr[j++];
-				/* HDMI_Video_present? */
-				if (tmp & 0x20) {
-					/* Latency_Fields_present? */
-					if (tmp & 0x80)
-						j += 2;
-					/* I_Latency_Fields_present? */
-					if (tmp & 0x40)
-						j += 2;
-					/* 3D_present? */
-					if (j <= len && (ptr[j] & 0x80))
-						edid->support_stereo = 1;
-					/* HDMI_VIC_LEN */
-					if (++j <= len && (ptr[j] & 0xe0)) {
-						int k = 0;
-						edid->hdmi_vic_len = ptr[j] >> 5;
-						for (k = 0; k < edid->hdmi_vic_len; k++)
-						    edid->hdmi_vic[k] = ptr[j+k+1];
-					}
+			case 1:
+				{
+					int sad_n = edid->eld.sad_count * 3;
+					edid->eld.sad_count += len / 3;
+					pr_debug("%s: incrementing eld.sad_count by %d to %d\n",
+							__func__, len / 3, edid->eld.sad_count);
+					edid->eld.conn_type = 0x00;
+					edid->eld.support_hdcp = 0x00;
+					for (i = 0; (i < len) && (sad_n < ELD_MAX_SAD_BYTES);
+							i++, sad_n++)
+						edid->eld.sad[sad_n] = ptr[i + 1];
+					len++;
+					ptr += len; /* adding the header */
+					/* Got an audio data block so enable audio */
+					if (basic_audio == true)
+						edid->eld.spk_alloc = 1;
+					break;
 				}
-			}
-			if ((len > 5) &&
-				(ptr[1] == 0x03) &&
-				(ptr[2] == 0x0c) &&
-				(ptr[3] == 0)) {
+				/* case 2 is commented out for now */
+			case 3:
+				{
+					int j = 0;
 
-				edid->eld.support_ai = (ptr[6] & 0x80);
-			}
+					if ((ptr[1] == 0x03) &&
+							(ptr[2] == 0x0c) &&
+							(ptr[3] == 0)) {
+						edid->eld.port_id[0] = ptr[4];
+						edid->eld.port_id[1] = ptr[5];
+					}
+					if ((len >= 8) &&
+							(ptr[1] == 0x03) &&
+							(ptr[2] == 0x0c) &&
+							(ptr[3] == 0)) {
+						j = 8;
+						tmp = ptr[j++];
+						/* HDMI_Video_present? */
+						if (tmp & 0x20) {
+							/* Latency_Fields_present? */
+							if (tmp & 0x80)
+								j += 2;
+							/* I_Latency_Fields_present? */
+							if (tmp & 0x40)
+								j += 2;
+							/* 3D_present? */
+							if (j <= len && (ptr[j] & 0x80))
+								edid->support_stereo = 1;
+							/* HDMI_VIC_LEN */
+							if (++j <= len && (ptr[j] & 0xe0)) {
+								int k = 0;
+								edid->hdmi_vic_len = ptr[j] >> 5;
+								for (k = 0; k < edid->hdmi_vic_len; k++)
+									edid->hdmi_vic[k] = ptr[j+k+1];
+							}
+						}
+					}
+					if ((len > 5) &&
+							(ptr[1] == 0x03) &&
+							(ptr[2] == 0x0c) &&
+							(ptr[3] == 0)) {
 
-			if ((len > 9) &&
-				(ptr[1] == 0x03) &&
-				(ptr[2] == 0x0c) &&
-				(ptr[3] == 0)) {
+						edid->eld.support_ai = (ptr[6] & 0x80);
+					}
 
-				edid->eld.aud_synch_delay = ptr[10];
-			}
-			len++;
-			ptr += len; /* adding the header */
-			break;
-		}
-		case 4:
-		{
-			edid->eld.spk_alloc = ptr[1];
-			len++;
-			ptr += len; /* adding the header */
-			break;
-		}
-		default:
-			len++; /* len does not include header */
-			ptr += len;
-			break;
+					if ((len > 9) &&
+							(ptr[1] == 0x03) &&
+							(ptr[2] == 0x0c) &&
+							(ptr[3] == 0)) {
+
+						edid->eld.aud_synch_delay = ptr[10];
+					}
+					len++;
+					ptr += len; /* adding the header */
+					break;
+				}
+			case 4:
+				{
+					edid->eld.spk_alloc = ptr[1];
+					len++;
+					ptr += len; /* adding the header */
+					break;
+				}
+			default:
+				len++; /* len does not include header */
+				ptr += len;
+				break;
 		}
 	}
 
@@ -339,8 +339,8 @@ int tegra_edid_mode_support_stereo(struct fb_videomode *mode)
 		return 0;
 
 	if (mode->xres == 1280 &&
-		mode->yres == 720 &&
-		((mode->refresh == 60) || (mode->refresh == 50)))
+			mode->yres == 720 &&
+			((mode->refresh == 60) || (mode->refresh == 50)))
 		return 1;
 
 	if (mode->xres == 1920 && mode->yres == 1080 && mode->refresh == 24)
@@ -357,7 +357,7 @@ static void data_release(struct kref *ref)
 }
 
 int tegra_edid_get_monspecs_test(struct tegra_edid *edid,
-			struct fb_monspecs *specs, unsigned char *edid_ptr)
+		struct fb_monspecs *specs, unsigned char *edid_ptr)
 {
 	int i, j, ret;
 	int extension_blocks;
@@ -385,7 +385,7 @@ int tegra_edid_get_monspecs_test(struct tegra_edid *edid,
 	}
 
 	memcpy(new_data->eld.monitor_name, specs->monitor,
-					sizeof(specs->monitor));
+			sizeof(specs->monitor));
 
 	new_data->eld.mnl = strlen(new_data->eld.monitor_name) + 1;
 	new_data->eld.product_id[0] = data[0x8];
@@ -406,12 +406,12 @@ int tegra_edid_get_monspecs_test(struct tegra_edid *edid,
 			if (new_data->support_stereo) {
 				for (j = 0; j < specs->modedb_len; j++) {
 					if (tegra_edid_mode_support_stereo(
-						&specs->modedb[j]))
+								&specs->modedb[j]))
 						specs->modedb[j].vmode |=
 #ifndef CONFIG_TEGRA_HDMI_74MHZ_LIMIT
-						FB_VMODE_STEREO_FRAME_PACK;
+							FB_VMODE_STEREO_FRAME_PACK;
 #else
-						FB_VMODE_STEREO_LEFT_RIGHT;
+					FB_VMODE_STEREO_LEFT_RIGHT;
 #endif
 				}
 			}
@@ -436,14 +436,32 @@ fail:
 }
 
 u8 custom_edid[] = {	// NSJ
-0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x10, 0xac, 0x43, 0xa0, 0x55, 0x37, 0x50, 0x31,
-0x03, 0x14, 0x01, 0x03, 0x80, 0x30, 0x1b, 0x78, 0xee, 0xee, 0x91, 0xa3, 0x54, 0x4c, 0x99, 0x26,
-0x0f, 0x50, 0x54, 0xa5, 0x4b, 0x00, 0x71, 0x4f, 0x81, 0x80, 0xd1, 0xc0, 0x01, 0x01, 0x01, 0x01,
-0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x3a, 0x80, 0x18, 0x71, 0x38, 0x2d, 0x40, 0x58, 0x2c,
-0x45, 0x00, 0xdd, 0x0c, 0x11, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x00, 0xff, 0x00, 0x54, 0x31, 0x34,
-0x36, 0x48, 0x30, 0x31, 0x42, 0x31, 0x50, 0x37, 0x55, 0x0a, 0x00, 0x00, 0x00, 0xfc, 0x00, 0x44,
-0x45, 0x4c, 0x4c, 0x20, 0x53, 0x32, 0x32, 0x30, 0x39, 0x57, 0x0a, 0x20, 0x00, 0x00, 0x00, 0xfd, 
-0x00, 0x32, 0x4c, 0x1e, 0x53, 0x11, 0x00, 0x0a, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x2e
+/*
+	0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x65, 0x6D, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 
+	0x30, 0x1A, 0x01, 0x03, 0x80, 0x22, 0x1B, 0x78, 0x2A, 0xEE, 0xA5, 0xA3, 0x54, 0x4C, 0x99, 0x26, 
+	0x14, 0x50, 0x54, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x55, 0x16, 0xA0, 0xDC, 0x50, 0x1C, 0x22, 0x20, 0x04, 0x10, 
+	0x33, 0x00, 0x6F, 0xE6, 0x10, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFC, 0x00, 0x41, 
+	0x50, 0x49, 0x58, 0x32, 0x5F, 0x42, 0x4D, 0x57, 0x5F, 0x35, 0x34, 0x30, 0x00, 0x00, 0x00, 0xFF, 
+	0x00, 0x41, 0x50, 0x49, 0x58, 0x32, 0x5F, 0x35, 0x34, 0x30, 0x0A, 0x20, 0x20, 0x20, 0x01, 0x6D, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F
+*/
+	0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x10, 0xac, 0x43, 0xa0, 0x55, 0x37, 0x50, 0x31,
+	0x03, 0x14, 0x01, 0x03, 0x80, 0x30, 0x1b, 0x78, 0xee, 0xee, 0x91, 0xa3, 0x54, 0x4c, 0x99, 0x26,
+	0x0f, 0x50, 0x54, 0xa5, 0x4b, 0x00, 0x71, 0x4f, 0x81, 0x80, 0xd1, 0xc0, 0x01, 0x01, 0x01, 0x01,
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x3a, 0x80, 0x18, 0x71, 0x38, 0x2d, 0x40, 0x58, 0x2c,
+	0x45, 0x00, 0xdd, 0x0c, 0x11, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x00, 0xff, 0x00, 0x54, 0x31, 0x34,
+	0x36, 0x48, 0x30, 0x31, 0x42, 0x31, 0x50, 0x37, 0x55, 0x0a, 0x00, 0x00, 0x00, 0xfc, 0x00, 0x44,
+	0x45, 0x4c, 0x4c, 0x20, 0x53, 0x32, 0x32, 0x30, 0x39, 0x57, 0x0a, 0x20, 0x00, 0x00, 0x00, 0xfd, 
+	0x00, 0x32, 0x4c, 0x1e, 0x53, 0x11, 0x00, 0x0a, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x2e
 };
 
 int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
@@ -505,12 +523,12 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 			if (new_data->support_stereo) {
 				for (j = 0; j < specs->modedb_len; j++) {
 					if (tegra_edid_mode_support_stereo(
-						&specs->modedb[j]))
+								&specs->modedb[j]))
 						specs->modedb[j].vmode |=
 #ifndef CONFIG_TEGRA_HDMI_74MHZ_LIMIT
-						FB_VMODE_STEREO_FRAME_PACK;
+							FB_VMODE_STEREO_FRAME_PACK;
 #else
-						FB_VMODE_STEREO_LEFT_RIGHT;
+					FB_VMODE_STEREO_LEFT_RIGHT;
 #endif
 				}
 			}
@@ -520,19 +538,19 @@ int tegra_edid_get_monspecs(struct tegra_edid *edid, struct fb_monspecs *specs)
 				int l = specs->modedb_len;
 				struct fb_videomode *m;
 				m = kzalloc((specs->modedb_len + new_data->hdmi_vic_len) *
-				    sizeof(struct fb_videomode), GFP_KERNEL);
+						sizeof(struct fb_videomode), GFP_KERNEL);
 				if (!m)
-				    break;
+					break;
 				memcpy(m, specs->modedb, specs->modedb_len *
-				        sizeof(struct fb_videomode));
+						sizeof(struct fb_videomode));
 				for (k = 0; k < new_data->hdmi_vic_len; k++) {
-				    unsigned vic = new_data->hdmi_vic[k];
-				    if (vic >= HDMI_EXT_MODEDB_SIZE) {
-				        pr_warning("Unsupported HDMI VIC %d, ignoring\n", vic);
-				        continue;
-				    }
-				    memcpy(&m[l], &hdmi_ext_modes[vic], sizeof(m[l]));
-				    l++;
+					unsigned vic = new_data->hdmi_vic[k];
+					if (vic >= HDMI_EXT_MODEDB_SIZE) {
+						pr_warning("Unsupported HDMI VIC %d, ignoring\n", vic);
+						continue;
+					}
+					memcpy(&m[l], &hdmi_ext_modes[vic], sizeof(m[l]));
+					l++;
 				}
 				kfree(specs->modedb);
 				specs->modedb = m;
@@ -587,7 +605,7 @@ int tegra_edid_get_eld(struct tegra_edid *edid, struct tegra_edid_hdmi_eld *eldd
 }
 
 struct tegra_edid *tegra_edid_create(struct tegra_dc *dc,
-	i2c_transfer_func_t i2c_func)
+		i2c_transfer_func_t i2c_func)
 {
 	struct tegra_edid *edid;
 
@@ -652,27 +670,27 @@ void tegra_dc_put_edid(struct tegra_dc_edid *edid)
 EXPORT_SYMBOL(tegra_dc_put_edid);
 
 static const struct i2c_device_id tegra_edid_id[] = {
-        { "tegra_edid", 0 },
-        { }
+	{ "tegra_edid", 0 },
+	{ }
 };
 
 MODULE_DEVICE_TABLE(i2c, tegra_edid_id);
 
 static struct i2c_driver tegra_edid_driver = {
-        .id_table = tegra_edid_id,
-        .driver = {
-                .name = "tegra_edid",
-        },
+	.id_table = tegra_edid_id,
+	.driver = {
+		.name = "tegra_edid",
+	},
 };
 
 static int __init tegra_edid_init(void)
 {
-        return i2c_add_driver(&tegra_edid_driver);
+	return i2c_add_driver(&tegra_edid_driver);
 }
 
 static void __exit tegra_edid_exit(void)
 {
-        i2c_del_driver(&tegra_edid_driver);
+	i2c_del_driver(&tegra_edid_driver);
 }
 
 module_init(tegra_edid_init);

@@ -649,6 +649,10 @@ deps_drivers/video/tegra/dc/dc_sysfs.o := \
   /home/ubuntu/kernel/include/linux/platform_device.h \
     $(wildcard include/config/suspend.h) \
     $(wildcard include/config/hibernate/callbacks.h) \
+  /home/ubuntu/kernel/include/linux/console.h \
+    $(wildcard include/config/hw/console.h) \
+    $(wildcard include/config/tty.h) \
+    $(wildcard include/config/vga/console.h) \
   /home/ubuntu/kernel/arch/arm/mach-tegra/include/mach/dc.h \
     $(wildcard include/config/arch/tegra/14x/soc.h) \
     $(wildcard include/config/arch/tegra/12x/soc.h) \

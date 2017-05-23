@@ -111,6 +111,7 @@ static int calc_ref_to_sync(struct tegra_dc_mode *mode)
 
 static bool check_ref_to_sync(struct tegra_dc_mode *mode)
 {
+/*
 	pr_info("NSJ print mode information in check_ref_to_sync()\n");
 	pr_info("\tpclk=%d\n\trated_pclk=%d\n\th_ref_to_sync=%d\n\tv_ref_to_sync=%d\n",
 		mode->pclk, mode->rated_pclk, mode->h_ref_to_sync, mode->v_ref_to_sync);
@@ -118,7 +119,7 @@ static bool check_ref_to_sync(struct tegra_dc_mode *mode)
 		mode->h_sync_width, mode->v_sync_width, mode->h_back_porch, mode->v_back_porch);
 	pr_info("\th_active=%d\n\tv_active=%d\n\th_front_porch=%d\n\tv_front_porch=%d\n",
 		mode->h_active, mode->v_active, mode->h_front_porch, mode->v_front_porch);
-
+*/
 	/* Constraint 1: H_REF_TO_SYNC + H_SYNC_WIDTH + H_BACK_PORCH > 11. */
 	if (mode->h_ref_to_sync + mode->h_sync_width + mode->h_back_porch <= 11) {
 		pr_info("NSJ check_ref_to_sync 1\n");

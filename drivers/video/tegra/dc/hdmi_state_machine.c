@@ -178,7 +178,7 @@ static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 	struct fb_event event;
 	struct fb_info *pfb = hdmi->dc->fb->info;
 	int blank = 1;
-
+//	return; // NSJ
 	event.info = pfb;
 	event.data = &blank;
 

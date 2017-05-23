@@ -1486,12 +1486,14 @@ int fb_add_videomode(const struct fb_videomode *mode, struct list_head *head)
 	list_for_each(pos, head) {
 		modelist = list_entry(pos, struct fb_modelist, list);
 		m = &modelist->mode;
+		pr_info("NSJ modedb, fb_add_videomode, %dx%d", m->xres, m->yres);
 		if (fb_mode_is_equal(m, mode)) {
 			found = 1;
-			break;
+			//break;
 		}
 	}
 	if (!found) {
+		pr_info("NSJ modedb, fb_add_videomode, not found\n");
 		modelist = kmalloc(sizeof(struct fb_modelist),
 						  GFP_KERNEL);
 
@@ -1500,6 +1502,8 @@ int fb_add_videomode(const struct fb_videomode *mode, struct list_head *head)
 		modelist->mode = *mode;
 		list_add_tail(&modelist->list, head);
 	}
+	else
+		pr_info("NSJ fb_add_videomode, found\n");
 	return 0;
 }
 
