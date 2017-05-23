@@ -16,6 +16,8 @@ case "$1" in
 	prepare)	make O=$TEGRA_KERNEL_OUT modules_prepare;;
 	mrproper)	make O=$TEGRA_KERNEL_OUT mrproper;;
 	clean)		make O=$TEGRA_KERNEL_OUT distclean;;
+	cp)		echo "cp to /boot/$2"
+			sudo cp out/arch/arm/boot/zImage /boot/$2;;
 	*)		echo "none";;
 esac
 

@@ -43,6 +43,8 @@
 #include "host/dev.h"
 #include "dc/dc_priv.h"
 
+#include "fb_bootsplash_func.h"	// NSJ
+
 /* Pad pitch to 256-byte boundary. */
 #define TEGRA_LINEAR_PITCH_ALIGNMENT 256
 
@@ -278,6 +280,11 @@ static int tegra_fb_blank(int blank, struct fb_info *info)
 	struct tegra_fb_info *tegra_fb = info->par;
 	struct tegra_dc *dc = tegra_fb->win.dc;
 
+	pr_info("NSJ tegra_fb_blank, blank(%X)\n", blank);
+	if(blank == FB_BLANK_POWERDOWN)
+	{
+		fb_bootsplash_exit();
+	}
 	switch (blank) {
 	case FB_BLANK_UNBLANK:
 		dev_dbg(&tegra_fb->ndev->dev, "unblank\n");
@@ -815,7 +822,13 @@ struct tegra_fb_info *tegra_fb_register(struct platform_device *ndev,
 		tegra_dc_program_bandwidth(win->dc, true);
 	}
 
+	pr_info("NSJ tegra_fb_register, %s\n", kobject_name(&((&(ndev->dev))->kobj)));
 	dev_info(&ndev->dev, "fb registered\n");
+
+	if(!strcmp(kobject_name(&(ndev->dev.kobj)), "tegradc.1"))
+	{
+		fb_bootsplash_init();
+	}
 
 	return tegra_fb;
 

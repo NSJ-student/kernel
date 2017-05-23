@@ -882,6 +882,7 @@ deps_drivers/video/tegra/fb.o := \
   /home/ubuntu/kernel/include/trace/define_trace.h \
   /home/ubuntu/kernel/include/linux/tegra-powergate.h \
   /home/ubuntu/kernel/include/video/tegra_dc_ext.h \
+  /home/ubuntu/kernel/drivers/video/tegra/fb_bootsplash_func.h \
 
 drivers/video/tegra/fb.o: $(deps_drivers/video/tegra/fb.o)
 
