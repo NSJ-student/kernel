@@ -78,7 +78,7 @@ void fb_bootsplash_timeover(unsigned long arg)
 
 int fb_bootsplash_init(void)
 {
-	struct linux_logo * logo = &logo_1920_clut224;
+	struct linux_logo * logo = &logo_linux_clut224;
         struct fb_info * info = registered_fb[1];
         unsigned char *img_rotate = NULL;
         // variable setting
