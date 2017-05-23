@@ -797,4 +797,6 @@ extern int fb_find_mode(struct fb_var_screeninfo *var,
 			const struct fb_videomode *default_mode,
 			unsigned int default_bpp);
 
+extern struct fb_videomode custom_mode;
+
 #endif /* _LINUX_FB_H */

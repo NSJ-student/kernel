@@ -32,6 +32,7 @@
 #include "hdmi.h"
 #include "nvsr.h"
 
+#if 0
 static struct fb_videomode * add_monspecs (
 	struct fb_videomode *modes, int *mode_len, struct fb_videomode *mode)
 {
@@ -46,35 +47,32 @@ static struct fb_videomode * add_monspecs (
 
 	return modes;
 }
+#endif
 
 static ssize_t mode_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t count)
 {
 	struct platform_device *ndev = to_platform_device(dev);
 	struct tegra_dc *dc = platform_get_drvdata(ndev);
-	struct fb_monspecs specs;
-	struct fb_videomode mode;
 	struct tegra_dc_hdmi_data *hdmi = tegra_dc_get_outdata(dc);
-	struct fb_event event;
-	struct fb_info *pfb = hdmi->dc->fb->info;
-	int blank = 1;
 
 	mutex_lock(&dc->lock);
-	if (sscanf(buf,
-		"%d %d %d %d %d %d %d %d %d %d %d\n",
-		&mode.refresh,
-		&mode.xres,
-		&mode.yres,
-		&mode.pixclock,
-		&mode.left_margin,
-		&mode.right_margin,
-		&mode.upper_margin,
-		&mode.lower_margin,
-		&mode.hsync_len,
-		&mode.vsync_len,
-		&mode.sync) != 11)
+	memset(&custom_mode, 0, sizeof(custom_mode));
+	if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d\n",
+		&custom_mode.refresh,
+		&custom_mode.xres,
+		&custom_mode.yres,
+		&custom_mode.pixclock,
+		&custom_mode.left_margin,
+		&custom_mode.right_margin,
+		&custom_mode.upper_margin,
+		&custom_mode.lower_margin,
+		&custom_mode.hsync_len,
+		&custom_mode.vsync_len,
+		&custom_mode.sync) != 11)
 	{
-		pr_info("mode_store: error\n");
+		memset(&custom_mode, 0, sizeof(custom_mode));
+		pr_info("mode_store: input error\n");
 		mutex_unlock(&dc->lock);
 		return count;
 	}
@@ -92,43 +90,20 @@ static ssize_t mode_store(struct device *dev,
 		"hsync_len: %d\n"
 		"vsync_len: %d\n"
 		"sync: %d\n",
-		mode.refresh,
-		mode.xres,
-		mode.yres,
-		mode.pixclock,
-		mode.left_margin,
-		mode.right_margin,
-		mode.upper_margin,
-		mode.lower_margin,
-		mode.hsync_len,
-		mode.vsync_len,
-		mode.sync);
+		custom_mode.refresh,
+		custom_mode.xres,
+		custom_mode.yres,
+		custom_mode.pixclock,
+		custom_mode.left_margin,
+		custom_mode.right_margin,
+		custom_mode.upper_margin,
+		custom_mode.lower_margin,
+		custom_mode.hsync_len,
+		custom_mode.vsync_len,
+		custom_mode.sync);
 
-// HDMI EDID
-	tegra_edid_get_monspecs(hdmi->edid, &specs);
-	specs.modedb = add_monspecs(specs.modedb, &specs.modedb_len, &mode);
-	hdmi->eld_retrieved = true;
-	pr_info("panel size %d by %d\n", specs.max_x, specs.max_y);
-	hdmi->dc->out->h_size = specs.max_x * 1000;
-	hdmi->dc->out->v_size = specs.max_y * 1000;
-	hdmi->dvi = !(specs.misc & FB_MISC_HDMI);
-	tegra_fb_update_monspecs(hdmi->dc->fb, &specs, tegra_dc_hdmi_mode_filter);
+	hdmi_reset_l(hdmi);
 
-// HDMI Enable
-
-	event.info = pfb;
-	event.data = &blank;
-
-	tegra_dc_enable(dc);
-	console_lock();
-	// blank 
-	fb_notifier_call_chain(FB_EVENT_BLANK, &event);
-	blank = 0;
-	// unblank
-	fb_notifier_call_chain(FB_EVENT_BLANK, &event);
-	console_unlock();
-
-/////////////////////////////////////
 	mutex_unlock(&dc->lock);
 
 	return count;

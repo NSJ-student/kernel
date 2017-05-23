@@ -600,6 +600,7 @@ static void get_detailed_timing(unsigned char *block,
 	       (VSYNC_POSITIVE) ? "+" : "-");
 }
 
+struct fb_videomode custom_mode;
 /**
  * fb_create_modedb - create video mode database
  * @edid: EDID data
@@ -632,16 +633,24 @@ static struct fb_videomode *fb_create_modedb(unsigned char *edid, int *dbsize)
 	}
 
 	*dbsize = 0;
+	if(custom_mode.pixclock != 0)
+	{
+		num = 1;
+		memcpy(&mode[0], &custom_mode, sizeof(custom_mode));
+		mode[0].flag |= FB_MODE_IS_FIRST;
+	}
 
 	DPRINTK("   Detailed Timings\n");
 	block = edid + DETAILED_TIMING_DESCRIPTIONS_START;
 	for (i = 0; i < 4; i++, block+= DETAILED_TIMING_DESCRIPTION_SIZE) {
 		if (!(block[0] == 0x00 && block[1] == 0x00)) {
 			get_detailed_timing(block, &mode[num]);
+/*
 			if (first) {
 			        mode[num].flag |= FB_MODE_IS_FIRST;
 				first = 0;
 			}
+*/
 			num++;
 		}
 	}

@@ -215,6 +215,16 @@ static void hdmi_disable_l(struct tegra_dc_hdmi_data *hdmi)
 	}
 }
 
+void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
+{
+	/* Were we just reset?  If so, shut everything down, then schedule a
+	 * check of the plug state in the near future.
+	 */
+	hdmi_disable_l(hdmi);
+	hdmi_state_machine_set_state_l(HDMI_STATE_CHECK_PLUG_STATE,
+				       CHECK_PLUG_STATE_DELAY_MS);
+}
+
 static void handle_reset_l(struct tegra_dc_hdmi_data *hdmi)
 {
 	/* Were we just reset?  If so, shut everything down, then schedule a
