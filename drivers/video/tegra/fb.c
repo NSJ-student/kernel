@@ -596,9 +596,12 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 		 * displayed on 'mode' device.
 		 */
 		fb_info->info->mode = (struct fb_videomode*) NULL;
+		pr_info("NSJ tegra_fb_update_monspecs, fb_add_videomode\n");
 		fb_add_videomode(&tegra_dc_vga_mode, &fb_info->info->modelist);
+		pr_info("NSJ tegra_fb_update_monspecs, fb_videomode_to_var\n");
 		fb_videomode_to_var(&fb_info->info->var, &tegra_dc_vga_mode);
 
+		pr_info("NSJ tegra_fb_update_monspecs, tegra_dc_set_mode\n");
 		tegra_dc_set_mode(fb_info->win.dc, &mode);
 		mutex_unlock(&fb_info->info->lock);
 		return;
@@ -625,6 +628,7 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 	event.info = fb_info->info;
 	/* Restoring to state running. */
 	fb_info->info->state =  FBINFO_STATE_RUNNING;
+	pr_info("NSJ tegra_fb_update_monspecs, call evnet\n");
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
 	console_lock();
 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
@@ -646,6 +650,7 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 #else
 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
 #endif
+	pr_info("NSJ tegra_fb_update_monspecs, end evnet\n");
 	mutex_unlock(&fb_info->info->lock);
 }
 

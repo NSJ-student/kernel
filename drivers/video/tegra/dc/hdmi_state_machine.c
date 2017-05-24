@@ -93,14 +93,15 @@ static const char * const state_names[] = {
 	"Recheck EDID",
 	"Takeover from bootloader",
 };
+static int hdmi_reset;
 
 static void hdmi_state_machine_set_state_l(int target_state, int resched_time)
 {
 	rt_mutex_lock(&work_lock);
 
 	pr_info("%s: switching from state %d (%s) to state %d (%s)\n",
-		__func__, work_state.state, state_names[work_state.state],
-		target_state, state_names[target_state]);
+			__func__, work_state.state, state_names[work_state.state],
+			target_state, state_names[target_state]);
 	work_state.state = target_state;
 
 	/* If the pending_hpd_evt flag is already set, don't bother to
@@ -178,10 +179,11 @@ static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 	struct fb_event event;
 	struct fb_info *pfb = hdmi->dc->fb->info;
 	int blank = 1;
-//	return; // NSJ
+	//	return; // NSJ
 	event.info = pfb;
 	event.data = &blank;
 
+	pr_info("NSJ handle_enable_l\n");
 	tegra_dc_enable(hdmi->dc);
 
 	console_lock();
@@ -195,6 +197,7 @@ static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 
 static void hdmi_disable_l(struct tegra_dc_hdmi_data *hdmi)
 {
+	pr_info("NSJ hdmi_disable_l\n");
 #ifdef CONFIG_SWITCH
 	switch_set_state(&hdmi->audio_switch, 0);
 	pr_info("%s: audio_switch 0\n", __func__);
@@ -205,47 +208,48 @@ static void hdmi_disable_l(struct tegra_dc_hdmi_data *hdmi)
 	if (hdmi->dc->enabled) {
 		pr_info("HDMI from connected to disconnected\n");
 		hdmi->dc->connected = false;
-		tegra_dc_disable(hdmi->dc);
+		if(!hdmi_reset) {
+			pr_info("NSJ hdmi_disable_l, tegra_dc_disable\n");
+			tegra_dc_disable(hdmi->dc);
+		}
 #ifdef CONFIG_ADF_TEGRA
+		pr_info("NSJ hdmi_disable_l, tegra_adf_process_hotplug_disconnected\n");
 		tegra_adf_process_hotplug_disconnected(hdmi->dc->adf);
 #else
+		pr_info("NSJ hdmi_disable_l, tegra_fb_update_monspecs\n");
 		tegra_fb_update_monspecs(hdmi->dc->fb, NULL, NULL);
 #endif
-		tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
+		if(!hdmi_reset) {
+			pr_info("NSJ hdmi_disable_l, tegra_dc_ext_process_hotplug\n");
+			tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
+		}
 	}
-}
-
-void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
-{
-	/* Were we just reset?  If so, shut everything down, then schedule a
-	 * check of the plug state in the near future.
-	 */
-	hdmi_disable_l(hdmi);
-	hdmi_state_machine_set_state_l(HDMI_STATE_CHECK_PLUG_STATE,
-				       CHECK_PLUG_STATE_DELAY_MS);
 }
 
 static void handle_reset_l(struct tegra_dc_hdmi_data *hdmi)
 {
+	pr_info("NSJ handle_reset_l\n");
 	/* Were we just reset?  If so, shut everything down, then schedule a
 	 * check of the plug state in the near future.
 	 */
 	hdmi_disable_l(hdmi);
 	hdmi_state_machine_set_state_l(HDMI_STATE_CHECK_PLUG_STATE,
-				       CHECK_PLUG_STATE_DELAY_MS);
+			CHECK_PLUG_STATE_DELAY_MS);
 }
 
 static void handle_check_plug_state_l(struct tegra_dc_hdmi_data *hdmi)
 {
 	if (tegra_dc_hpd(work_state.hdmi->dc)) {
+		pr_info("NSJ handle_check_plug_state_l, hpd on\n");
 		/* Looks like there is something plugged in.
 		 * Get ready to read the sink's EDID information.
 		 */
 		work_state.edid_reads = 0;
 
 		hdmi_state_machine_set_state_l(HDMI_STATE_CHECK_EDID,
-					       CHECK_EDID_DELAY_MS);
+				CHECK_EDID_DELAY_MS);
 	} else {
+		pr_info("NSJ handle_check_plug_state_l, hpd off\n");
 		/* nothing plugged in, so we are finished.  Go to the
 		 * DONE_DISABLED state and stay there until the next HPD event.
 		 * */
@@ -266,7 +270,7 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 	/* Set default videomode on dc before enabling it*/
 	tegra_dc_set_default_videomode(hdmi->dc);
 #endif
-
+	pr_info("NSJ handle_check_edid_l, edid_reads=%d\n", work_state.edid_reads);
 	if (!tegra_dc_hpd(work_state.hdmi->dc)) {
 		/* hpd dropped - stop EDID read */
 		pr_info("hpd == 0, aborting EDID read\n");
@@ -281,11 +285,11 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 		work_state.edid_reads++;
 		if (work_state.edid_reads >= MAX_EDID_READ_ATTEMPTS) {
 			pr_info("Failed to read EDID after %d times. Giving up.\n",
-				work_state.edid_reads);
+					work_state.edid_reads);
 			goto end_disabled;
 		} else {
 			hdmi_state_machine_set_state_l(HDMI_STATE_CHECK_EDID,
-						       CHECK_EDID_DELAY_MS);
+					CHECK_EDID_DELAY_MS);
 		}
 
 		return;
@@ -311,7 +315,7 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 	tegra_adf_process_hotplug_connected(hdmi->dc->adf, &specs);
 #else
 	tegra_fb_update_monspecs(hdmi->dc->fb, &specs,
-		tegra_dc_hdmi_mode_filter);
+			tegra_dc_hdmi_mode_filter);
 #endif
 #ifdef CONFIG_SWITCH
 	state = tegra_edid_audio_supported(hdmi->edid) ? 1 : 0;
@@ -322,20 +326,22 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 #endif
 	hdmi->dc->connected = true;
 
-	tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
+	pr_info("NSJ handle_check_edid_l, hdmi_reset=%d\n", hdmi_reset);
+	if(!hdmi_reset){
+		tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
 
-	if (unlikely(tegra_is_clk_enabled(hdmi->clk))) {
-		/* the only time this should happen is on boot, where the
-		 * sequence is that hdmi is enabled before EDID is read.
-		 * hdmi_enable() doesn't have EDID information yet so can't
-		 * setup audio and infoframes, so we have to do so here.
-		 */
-		pr_info("%s: setting audio and infoframes\n", __func__);
-		tegra_dc_io_start(hdmi->dc);
-		tegra_dc_hdmi_setup_audio_and_infoframes(hdmi->dc);
-		tegra_dc_io_end(hdmi->dc);
+		if (unlikely(tegra_is_clk_enabled(hdmi->clk))) {
+			/* the only time this should happen is on boot, where the
+			 * sequence is that hdmi is enabled before EDID is read.
+			 * hdmi_enable() doesn't have EDID information yet so can't
+			 * setup audio and infoframes, so we have to do so here.
+			 */
+			pr_info("%s: setting audio and infoframes\n", __func__);
+			tegra_dc_io_start(hdmi->dc);
+			tegra_dc_hdmi_setup_audio_and_infoframes(hdmi->dc);
+			tegra_dc_io_end(hdmi->dc);
+		}
 	}
-
 	hdmi_state_machine_set_state_l(HDMI_STATE_DONE_ENABLED, 0);
 
 	return;
@@ -348,15 +354,29 @@ end_disabled:
 
 static void handle_wait_for_hpd_reassert_l(struct tegra_dc_hdmi_data *hdmi)
 {
+	pr_info("NSJ handle_wait_for_hpd_reassert_l\n");
 	/* Looks like HPD dropped and really did stay low.  Go ahead and reset
 	 * the system.
 	 */
 	hdmi_state_machine_set_state_l(HDMI_STATE_RESET, 0);
 }
 
+void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
+{
+//	hdmi_reset = 1;
+	pr_info("NSJ hdmi_reset_l start\n");
+	hdmi_disable_l(hdmi);
+	pr_info("NSJ hdmi_reset_l handle_check_edid_l\n");
+	handle_check_edid_l(hdmi);
+	pr_info("NSJ hdmi_reset_l handle_enable_l\n");
+	handle_enable_l(hdmi);
+	pr_info("NSJ hdmi_reset_l stop\n");
+//	hdmi_reset = 0;
+}
+
 /* returns bytes read, or negative error */
 static int read_edid_into_buffer(struct tegra_dc_hdmi_data *hdmi,
-				 u8 *edid_data, size_t edid_data_len)
+		u8 *edid_data, size_t edid_data_len)
 {
 	int err, i;
 	int extension_blocks;
@@ -369,14 +389,14 @@ static int read_edid_into_buffer(struct tegra_dc_hdmi_data *hdmi,
 	}
 	extension_blocks = edid_data[0x7e];
 	pr_info("%s: extension_blocks = %d, max_ext_blocks = %d\n",
-		__func__, extension_blocks, max_ext_blocks);
+			__func__, extension_blocks, max_ext_blocks);
 	if (extension_blocks > max_ext_blocks)
 		extension_blocks = max_ext_blocks;
 	for (i = 1; i <= extension_blocks; i++) {
 		err = tegra_edid_read_block(hdmi->edid, i, edid_data + i * 128);
 		if (err) {
 			pr_err("tegra_edid_read_block(%d) returned err %d\n",
-				i, err);
+					i, err);
 			return err;
 		}
 	}
@@ -398,12 +418,12 @@ static int hdmi_recheck_edid(struct tegra_dc_hdmi_data *hdmi, int *match)
 		struct tegra_dc_edid *data = tegra_edid_get_data(hdmi->edid);
 		pr_info("old edid len = %ld\n", (long int)data->len);
 		*match = ((ret == data->len) &&
-			  !memcmp(tmp, data->buf, data->len));
+				!memcmp(tmp, data->buf, data->len));
 		if (*match == 0) {
 			print_hex_dump(KERN_INFO, "tmp :", DUMP_PREFIX_ADDRESS,
-				       16, 4, tmp, ret, true);
+					16, 4, tmp, ret, true);
 			print_hex_dump(KERN_INFO, "data:", DUMP_PREFIX_ADDRESS,
-				       16, 4, data->buf, data->len, true);
+					16, 4, data->buf, data->len, true);
 		}
 		tegra_edid_put_data(data);
 		ret = 0;
@@ -426,7 +446,7 @@ static void handle_recheck_edid_l(struct tegra_dc_hdmi_data *hdmi)
 		work_state.edid_reads++;
 		if (work_state.edid_reads >= MAX_EDID_READ_ATTEMPTS) {
 			pr_info("Failed to read EDID after %d times. Giving up.\n",
-				work_state.edid_reads);
+					work_state.edid_reads);
 		} else {
 			tgt_state = HDMI_STATE_DONE_RECHECK_EDID;
 			timeout = CHECK_EDID_DELAY_MS;
@@ -491,8 +511,8 @@ static void hdmi_state_machine_worker(struct work_struct *work)
 	cur_hpd = tegra_dc_hpd(work_state.hdmi->dc);
 
 	pr_info("%s (tid %p): state %d (%s), hpd %d, pending_hpd_evt %d\n",
-		__func__, current, work_state.state,
-		state_names[work_state.state], cur_hpd, pending_hpd_evt);
+			__func__, current, work_state.state,
+			state_names[work_state.state], cur_hpd, pending_hpd_evt);
 
 	if (pending_hpd_evt) {
 		/* If we were woken up because of HPD activity, just schedule
@@ -504,12 +524,12 @@ static void hdmi_state_machine_worker(struct work_struct *work)
 
 		if (NULL == func)
 			pr_warn("NULL state machine handler while in state %d; how did we end up here?",
-				work_state.state);
+					work_state.state);
 		else
 			func(work_state.hdmi);
 	} else {
 		pr_warn("hdmi state machine worker scheduled unexpected state %d",
-			work_state.state);
+				work_state.state);
 	}
 }
 

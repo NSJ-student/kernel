@@ -1483,13 +1483,36 @@ int fb_add_videomode(const struct fb_videomode *mode, struct list_head *head)
 	struct fb_videomode *m;
 	int found = 0;
 
+        pr_info(
+                "refresh: %d\n"
+                "xres: %d\n"
+                "yres: %d\n"
+                "pixclock: %d\n"
+                "left_margin: %d\n"
+                "right_margin: %d\n"
+                "upper_margin: %d\n"
+                "lower_margin: %d\n"
+                "hsync_len: %d\n"
+                "vsync_len: %d\n"
+                "sync: %d\n",
+                mode->refresh,
+                mode->xres,
+                mode->yres,
+                mode->pixclock,
+                mode->left_margin,
+                mode->right_margin,
+                mode->upper_margin,
+                mode->lower_margin,
+                mode->hsync_len,
+                mode->vsync_len,
+                mode->sync);
+	
 	list_for_each(pos, head) {
 		modelist = list_entry(pos, struct fb_modelist, list);
 		m = &modelist->mode;
-		pr_info("NSJ modedb, fb_add_videomode, %dx%d", m->xres, m->yres);
 		if (fb_mode_is_equal(m, mode)) {
 			found = 1;
-			//break;
+			break;
 		}
 	}
 	if (!found) {

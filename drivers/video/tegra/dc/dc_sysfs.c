@@ -55,14 +55,20 @@ static ssize_t mode_store(struct device *dev,
 	struct platform_device *ndev = to_platform_device(dev);
 	struct tegra_dc *dc = platform_get_drvdata(ndev);
 	struct tegra_dc_hdmi_data *hdmi = tegra_dc_get_outdata(dc);
+#ifdef PCLK_MODE
+	u32 mode_pclk;
+#endif
 
-	mutex_lock(&dc->lock);
 	memset(&custom_mode, 0, sizeof(custom_mode));
 	if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d\n",
 		&custom_mode.refresh,
 		&custom_mode.xres,
 		&custom_mode.yres,
+#ifdef PCLK_MODE
+		&mode_pclk,
+#else
 		&custom_mode.pixclock,
+#endif
 		&custom_mode.left_margin,
 		&custom_mode.right_margin,
 		&custom_mode.upper_margin,
@@ -76,8 +82,10 @@ static ssize_t mode_store(struct device *dev,
 		mutex_unlock(&dc->lock);
 		return count;
 	}
-	
-	pr_info("NSJ mode_store, [ %s ]\n", buf);
+#ifdef PCLK_MODE
+	custom_mode.pixclock = KHZ2PICOS(mode_pclk / 1000);
+#endif
+	pr_info("NSJ mode_store, %s", buf);
 	pr_info(
 		"refresh: %d\n"
 		"xres: %d\n"
@@ -103,8 +111,6 @@ static ssize_t mode_store(struct device *dev,
 		custom_mode.sync);
 
 	hdmi_reset_l(hdmi);
-
-	mutex_unlock(&dc->lock);
 
 	return count;
 }

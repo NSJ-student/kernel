@@ -434,6 +434,7 @@ EXPORT_SYMBOL(tegra_dc_get_panel_sync_rate);
 static int _tegra_dc_set_mode(struct tegra_dc *dc,
 				const struct tegra_dc_mode *mode)
 {
+	pr_info("NSJ _tegra_dc_set_mode start\n");
 	if (memcmp(&dc->mode, mode, sizeof(dc->mode)) == 0) {
 		/* mode is unchanged, just return */
 		return 0;
@@ -449,6 +450,7 @@ static int _tegra_dc_set_mode(struct tegra_dc *dc,
 
 	print_mode(dc, mode, __func__);
 	dc->frametime_ns = calc_frametime_ns(mode);
+	pr_info("NSJ _tegra_dc_set_mode end\n");
 
 	return 0;
 }
