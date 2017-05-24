@@ -55,36 +55,34 @@ static ssize_t mode_store(struct device *dev,
 	struct platform_device *ndev = to_platform_device(dev);
 	struct tegra_dc *dc = platform_get_drvdata(ndev);
 	struct tegra_dc_hdmi_data *hdmi = tegra_dc_get_outdata(dc);
-#ifdef PCLK_MODE
-	u32 mode_pclk;
-#endif
+	u32 mode_pclk = 0;
+	u32 mode_sel = 0;
 
 	memset(&custom_mode, 0, sizeof(custom_mode));
-	if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d\n",
+	if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d\n",
 		&custom_mode.refresh,
 		&custom_mode.xres,
 		&custom_mode.yres,
-#ifdef PCLK_MODE
 		&mode_pclk,
-#else
-		&custom_mode.pixclock,
-#endif
 		&custom_mode.left_margin,
 		&custom_mode.right_margin,
 		&custom_mode.upper_margin,
 		&custom_mode.lower_margin,
 		&custom_mode.hsync_len,
 		&custom_mode.vsync_len,
-		&custom_mode.sync) != 11)
+		&custom_mode.sync,
+		&mode_sel) != 12)
 	{
 		memset(&custom_mode, 0, sizeof(custom_mode));
 		pr_info("mode_store: input error\n");
 		mutex_unlock(&dc->lock);
 		return count;
 	}
-#ifdef PCLK_MODE
-	custom_mode.pixclock = KHZ2PICOS(mode_pclk / 1000);
-#endif
+	if(mode_sel)
+		custom_mode.pixclock = KHZ2PICOS(mode_pclk / 1000);
+	else
+		custom_mode.pixclock = mode_pclk;
+
 	pr_info("NSJ mode_store, %s", buf);
 	pr_info(
 		"refresh: %d\n"
@@ -112,6 +110,7 @@ static ssize_t mode_store(struct device *dev,
 
 	hdmi_reset_l(hdmi);
 
+	pr_info("NSJ mode_store end\n");
 	return count;
 }
 
