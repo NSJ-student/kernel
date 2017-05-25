@@ -59,19 +59,20 @@ static ssize_t mode_store(struct device *dev,
 	u32 mode_sel = 0;
 
 	memset(&custom_mode, 0, sizeof(custom_mode));
-	if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d\n",
+	if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d\n",
 		&custom_mode.refresh,
-		&custom_mode.xres,
-		&custom_mode.yres,
+		&custom_mode.xres,		// h_active
+		&custom_mode.yres,		// v_active
 		&mode_pclk,
-		&custom_mode.left_margin,
-		&custom_mode.right_margin,
-		&custom_mode.upper_margin,
-		&custom_mode.lower_margin,
-		&custom_mode.hsync_len,
-		&custom_mode.vsync_len,
-		&custom_mode.sync,
-		&mode_sel) != 12)
+		&custom_mode.left_margin,	// h_back_porch
+		&custom_mode.right_margin,	// h_front_porch
+		&custom_mode.upper_margin,	// v_back_porch
+		&custom_mode.lower_margin,	// v_front_porch
+		&custom_mode.hsync_len,		// h_sync
+		&custom_mode.vsync_len,		// v_sync
+		&custom_mode.sync,		
+		&custom_mode.vmode,
+		&mode_sel) != 13)
 	{
 		memset(&custom_mode, 0, sizeof(custom_mode));
 		pr_info("mode_store: input error\n");
@@ -95,7 +96,8 @@ static ssize_t mode_store(struct device *dev,
 		"lower_margin: %d\n"
 		"hsync_len: %d\n"
 		"vsync_len: %d\n"
-		"sync: %d\n",
+		"sync: %d\n"
+		"vmode: %d\n",
 		custom_mode.refresh,
 		custom_mode.xres,
 		custom_mode.yres,
@@ -106,7 +108,8 @@ static ssize_t mode_store(struct device *dev,
 		custom_mode.lower_margin,
 		custom_mode.hsync_len,
 		custom_mode.vsync_len,
-		custom_mode.sync);
+		custom_mode.sync,
+		custom_mode.vmode);
 
 	hdmi_reset_l(hdmi);
 
