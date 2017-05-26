@@ -355,8 +355,6 @@ void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
 	hdmi_disable_l(hdmi);
 	nsj_print_debug("NSJ hdmi_reset_l handle_check_edid_l\n");
 	handle_check_edid_l(hdmi);
-	nsj_print_debug("NSJ hdmi_reset_l handle_enable_l\n");
-	handle_enable_l(hdmi);
 	nsj_print_debug("NSJ hdmi_reset_l stop\n");
 }
 

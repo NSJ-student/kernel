@@ -149,29 +149,50 @@ static ssize_t mode_show(struct device *device,
 	struct platform_device *ndev = to_platform_device(device);
 	struct tegra_dc *dc = platform_get_drvdata(ndev);
 	struct tegra_dc_mode *m;
+	struct fb_info * info = dc->fb->info;
+	struct fb_modelist * modelist;
 	ssize_t res;
 
 	mutex_lock(&dc->lock);
 	m = &dc->mode;
 	res = snprintf(buf, PAGE_SIZE,
-		"pclk: %d\n"
-		"h_ref_to_sync: %d\n"
-		"v_ref_to_sync: %d\n"
-		"h_sync_width: %d\n"
-		"v_sync_width: %d\n"
-		"h_back_porch: %d\n"
-		"v_back_porch: %d\n"
-		"h_active: %d\n"
-		"v_active: %d\n"
-		"h_front_porch: %d\n"
-		"v_front_porch: %d\n"
-		"stereo_mode: %d\n",
+		"tegra_dc_mode: \n"
+		"   pclk: %d\n"
+		"   h_ref_to_sync: %d\n"
+		"   v_ref_to_sync: %d\n"
+		"   h_sync_width: %d\n"
+		"   v_sync_width: %d\n"
+		"   h_back_porch: %d\n"
+		"   v_back_porch: %d\n"
+		"   h_active: %d\n"
+		"   v_active: %d\n"
+		"   h_front_porch: %d\n"
+		"   v_front_porch: %d\n"
+		"   stereo_mode: %d\n"
+		"tegra_fb_info: xres(%d) x yres(%d)\n",
 		m->pclk, m->h_ref_to_sync, m->v_ref_to_sync,
 		m->h_sync_width, m->v_sync_width,
 		m->h_back_porch, m->v_back_porch,
 		m->h_active, m->v_active,
 		m->h_front_porch, m->v_front_porch,
-		m->stereo_mode);
+		m->stereo_mode,
+		dc->fb->xres, dc->fb->yres);
+
+	list_for_each_entry(modelist, &info->modelist, list) {
+		pr_info("NSJ fb_videomode:\n"
+			"   refresh xres yres pixclock h_back h_front v_back v_front hsync vsync\n"
+			"   %d %d %d %d %d %d %d %d %d %d\n",
+			modelist->mode.refresh,
+			modelist->mode.xres,
+			modelist->mode.yres,
+			modelist->mode.pixclock,
+			modelist->mode.left_margin,
+			modelist->mode.right_margin,
+			modelist->mode.upper_margin,
+			modelist->mode.lower_margin,
+			modelist->mode.hsync_len,
+			modelist->mode.vsync_len);
+	}
 	mutex_unlock(&dc->lock);
 
 	return res;

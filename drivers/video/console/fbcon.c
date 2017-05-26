@@ -2980,6 +2980,9 @@ static void fbcon_set_all_vcs(struct fb_info *info)
 
 	for (i = first_fb_vc; i <= last_fb_vc; i++) {
 		vc = vc_cons[i].d;
+		if(vc)
+			pr_info("NSJ fbcon_set_all_vcs, vc_cons=%d, vc_mode=0x%X, visible=%d\n", 
+				i, vc->vc_mode, CON_IS_VISIBLE(vc));
 		if (!vc || vc->vc_mode != KD_TEXT ||
 		    registered_fb[con2fb_map[i]] != info)
 			continue;
@@ -2999,6 +3002,7 @@ static void fbcon_set_all_vcs(struct fb_info *info)
 		vc_resize(vc, cols, rows);
 	}
 
+	pr_info("NSJ fbcon_set_all_vcs, fg=%d\n", fg);
 	if (fg != -1)
 		fbcon_modechanged(info);
 }
@@ -3194,8 +3198,9 @@ static void fbcon_fb_blanked(struct fb_info *info, int blank)
 
 	if (!ops || ops->currcon < 0)
 		return;
-
 	vc = vc_cons[ops->currcon].d;
+
+	pr_info("NSJ fbcon_fb_blanke, vc_num=%d, vc_mode=0x%X\n", vc->vc_num, vc->vc_mode);
 	if (vc->vc_mode != KD_TEXT ||
 			registered_fb[con2fb_map[ops->currcon]] != info)
 		return;
@@ -3283,7 +3288,7 @@ static int fbcon_event_notify(struct notifier_block *self,
 	if (fbcon_has_exited && !(action == FB_EVENT_FB_REGISTERED ||
 				  action == FB_EVENT_FB_UNREGISTERED))
 		goto done;
-	pr_info("NSJ fbcon_event_notify, action=%X\n", action);
+	pr_info("NSJ fbcon_event_notify, action=0x%X\n", action);
 	switch(action) {
 	case FB_EVENT_SUSPEND:
 		fbcon_suspended(info);
