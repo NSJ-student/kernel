@@ -4,6 +4,7 @@
 #include <linux/fb.h>
 #include <asm/uaccess.h>
 #include "fb_bootsplash_func.h"
+#include "dc/dc_priv.h"
 
 static inline unsigned safe_shift(unsigned d, int n)
 {
@@ -29,7 +30,7 @@ int set_image(struct d_image * arg, const char * path)
         old_fs = get_fs();
         set_fs(get_ds());
 
-	pr_info("NSJ fs successed!, %s\n", path);
+	nsj_print_debug("NSJ fs successed!, %s\n", path);
         set_fs(old_fs);
 	return -1;
         
@@ -46,7 +47,7 @@ int set_image(struct d_image * arg, const char * path)
         	set_fs(old_fs);
                 return -1;
         }
-	pr_info("NSJ open successed!\n");
+	nsj_print_debug("NSJ open successed!\n");
         filp_close(f, NULL);
         set_fs(old_fs);
 	return -1;

@@ -15,6 +15,7 @@
 #include <linux/slab.h>
 #include <linux/fb.h>
 #include <linux/kernel.h>
+#include "tegra/dc/dc_priv.h"
 
 #undef DEBUG
 
@@ -1482,19 +1483,21 @@ int fb_add_videomode(const struct fb_videomode *mode, struct list_head *head)
 	struct fb_modelist *modelist;
 	struct fb_videomode *m;
 	int found = 0;
-#if 0
-        pr_info(
-                "refresh: %d\n"
-                "xres: %d\n"
-                "yres: %d\n"
-                "pixclock: %d\n"
-                "left_margin: %d\n"
-                "right_margin: %d\n"
-                "upper_margin: %d\n"
-                "lower_margin: %d\n"
-                "hsync_len: %d\n"
-                "vsync_len: %d\n"
-                "sync: %d\n",
+
+	nsj_print_debug("NSJ fb_add_videomode\n");
+	nsj_print_debug(
+                "   refresh: %d\n"
+                "   xres: %d\n"
+                "   yres: %d\n"
+                "   pixclock: %d\n"
+                "   left_margin: %d\n"
+                "   right_margin: %d\n"
+                "   upper_margin: %d\n"
+                "   lower_margin: %d\n"
+                "   hsync_len: %d\n"
+                "   vsync_len: %d\n"
+                "   sync: %d\n"
+                "   vmode: %d\n",
                 mode->refresh,
                 mode->xres,
                 mode->yres,
@@ -1505,8 +1508,9 @@ int fb_add_videomode(const struct fb_videomode *mode, struct list_head *head)
                 mode->lower_margin,
                 mode->hsync_len,
                 mode->vsync_len,
-                mode->sync);
-#endif	
+                mode->sync,
+                mode->vmode);
+
 	list_for_each(pos, head) {
 		modelist = list_entry(pos, struct fb_modelist, list);
 		m = &modelist->mode;

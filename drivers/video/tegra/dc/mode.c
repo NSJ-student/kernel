@@ -111,43 +111,41 @@ static int calc_ref_to_sync(struct tegra_dc_mode *mode)
 
 static bool check_ref_to_sync(struct tegra_dc_mode *mode)
 {
-/*
-	pr_info("NSJ print mode information in check_ref_to_sync()\n");
-	pr_info("\tpclk=%d\n\trated_pclk=%d\n\th_ref_to_sync=%d\n\tv_ref_to_sync=%d\n",
+	nsj_print_debug("NSJ print mode information in check_ref_to_sync()\n");
+	nsj_print_debug("\tpclk=%d\n\trated_pclk=%d\n\th_ref_to_sync=%d\n\tv_ref_to_sync=%d\n",
 		mode->pclk, mode->rated_pclk, mode->h_ref_to_sync, mode->v_ref_to_sync);
-	pr_info("\th_sync_width=%d\n\tv_sync_width=%d\n\th_back_porch=%d\n\tv_back_porch=%d\n",
+	nsj_print_debug("\th_sync_width=%d\n\tv_sync_width=%d\n\th_back_porch=%d\n\tv_back_porch=%d\n",
 		mode->h_sync_width, mode->v_sync_width, mode->h_back_porch, mode->v_back_porch);
-	pr_info("\th_active=%d\n\tv_active=%d\n\th_front_porch=%d\n\tv_front_porch=%d\n",
+	nsj_print_debug("\th_active=%d\n\tv_active=%d\n\th_front_porch=%d\n\tv_front_porch=%d\n",
 		mode->h_active, mode->v_active, mode->h_front_porch, mode->v_front_porch);
-*/
 	/* Constraint 1: H_REF_TO_SYNC + H_SYNC_WIDTH + H_BACK_PORCH > 11. */
 	if (mode->h_ref_to_sync + mode->h_sync_width + mode->h_back_porch <= 11) {
-		pr_info("NSJ check_ref_to_sync 1\n");
+		nsj_print_debug("NSJ check_ref_to_sync 1\n");
 		return false;
 	}
 
 	/* Constraint 2: V_REF_TO_SYNC + V_SYNC_WIDTH + V_BACK_PORCH > 1. */
 	if (mode->v_ref_to_sync + mode->v_sync_width + mode->v_back_porch <= 1){
-		pr_info("NSJ check_ref_to_sync 2\n");
+		nsj_print_debug("NSJ check_ref_to_sync 2\n");
 		return false;
 	}
 
 	/* Constraint 3: V_FRONT_PORCH + V_SYNC_WIDTH + V_BACK_PORCH > 1
 	 * (vertical blank). */
 	if (mode->v_front_porch + mode->v_sync_width + mode->v_back_porch <= 1){
-		pr_info("NSJ check_ref_to_sync 3\n");
+		nsj_print_debug("NSJ check_ref_to_sync 3\n");
 		return false;
 	}
 
 	/* Constraint 4: V_SYNC_WIDTH >= 1; H_SYNC_WIDTH >= 1. */
 	if (mode->v_sync_width < 1 || mode->h_sync_width < 1){
-		pr_info("NSJ check_ref_to_sync 4\n");
+		nsj_print_debug("NSJ check_ref_to_sync 4\n");
 		return false;
 	}
 
 	/* Constraint 5: V_REF_TO_SYNC >= 1; H_REF_TO_SYNC >= 0. */
 	if (mode->v_ref_to_sync < 1 || mode->h_ref_to_sync < 0){
-		pr_info("NSJ check_ref_to_sync 5\n");
+		nsj_print_debug("NSJ check_ref_to_sync 5\n");
 		return false;
 	}
 
@@ -155,13 +153,13 @@ static bool check_ref_to_sync(struct tegra_dc_mode *mode)
 	 * H_FRONT_PORT >= (H_REF_TO_SYNC + 1). */
 	if (mode->v_front_porch < mode->v_ref_to_sync + 1 ||
 		mode->h_front_porch < mode->h_ref_to_sync + 1){
-		pr_info("NSJ check_ref_to_sync 6\n");
+		nsj_print_debug("NSJ check_ref_to_sync 6\n");
 		return false;
 	}
 
 	/* Constraint 7: H_DISP_ACTIVE >= 16; V_DISP_ACTIVE >= 16. */
 	if (mode->h_active < 16 || mode->v_active < 16){
-		pr_info("NSJ check_ref_to_sync 7\n");
+		nsj_print_debug("NSJ check_ref_to_sync 7\n");
 		return false;
 	}
 
@@ -434,7 +432,7 @@ EXPORT_SYMBOL(tegra_dc_get_panel_sync_rate);
 static int _tegra_dc_set_mode(struct tegra_dc *dc,
 				const struct tegra_dc_mode *mode)
 {
-	pr_info("NSJ _tegra_dc_set_mode start\n");
+	nsj_print_debug("NSJ _tegra_dc_set_mode start\n");
 	if (memcmp(&dc->mode, mode, sizeof(dc->mode)) == 0) {
 		/* mode is unchanged, just return */
 		return 0;
@@ -450,7 +448,7 @@ static int _tegra_dc_set_mode(struct tegra_dc *dc,
 
 	print_mode(dc, mode, __func__);
 	dc->frametime_ns = calc_frametime_ns(mode);
-	pr_info("NSJ _tegra_dc_set_mode end\n");
+	nsj_print_debug("NSJ _tegra_dc_set_mode end\n");
 
 	return 0;
 }

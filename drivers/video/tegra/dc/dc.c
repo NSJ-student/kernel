@@ -1369,6 +1369,7 @@ void tegra_dc_set_out_pin_polars(struct tegra_dc *dc,
 
 static struct tegra_dc_mode *tegra_dc_get_override_mode(struct tegra_dc *dc)
 {
+	nsj_print_debug("NSJ tegra_dc_get_override_mode,pclk= %d\n", override_disp_mode[dc->out->type].pclk);
 	if (dc->out->type == TEGRA_DC_OUT_RGB ||
 		dc->out->type == TEGRA_DC_OUT_HDMI ||
 		dc->out->type == TEGRA_DC_OUT_DSI)
@@ -3176,7 +3177,7 @@ static int tegra_dc_probe(struct platform_device *ndev)
 	    (dc->out->type == TEGRA_DC_OUT_HDMI)) {
 		struct fb_monspecs specs;
 		struct tegra_dc_hdmi_data *hdmi = tegra_dc_get_outdata(dc);
-		pr_info("NSJ tegra_dc_probe - tegra_edid_get_monspecs\n");
+		nsj_print_debug("NSJ tegra_dc_probe - tegra_edid_get_monspecs\n");
 		if (!tegra_edid_get_monspecs(hdmi->edid, &specs)) {
 			struct tegra_dc_mode *dcmode = &dc->out->modes[0];
 			dcmode->pclk          = specs.modedb->pixclock;
@@ -3654,6 +3655,8 @@ static int __init parse_disp_params(char *options, struct tegra_dc_mode *mode)
 	mode->h_front_porch = params[9];
 	mode->v_front_porch = params[10];
 
+	nsj_print_debug("NSJ parse_disp_params, \n");
+
 	return 0;
 }
 
@@ -3665,9 +3668,11 @@ static int __init tegra_dc_mode_override(char *str)
 		return -EINVAL;
 
 	p = strstr(str, "hdmi:");
+	nsj_print_debug("NSJ tegra_dc_mode_override, %s\n", p);
 	if (p) {
 		p += 5;
 		options = strsep(&p, ";");
+		nsj_print_debug("NSJ tegra_dc_mode_override, %s\n", options);
 		if (parse_disp_params(options, &override_disp_mode[TEGRA_DC_OUT_HDMI]))
 			return -EINVAL;
 	}

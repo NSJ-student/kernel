@@ -183,7 +183,7 @@ static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 	event.info = pfb;
 	event.data = &blank;
 
-	pr_info("NSJ handle_enable_l\n");
+	nsj_print_debug("NSJ handle_enable_l\n");
 	tegra_dc_enable(hdmi->dc);
 
 	console_lock();
@@ -197,7 +197,7 @@ static void handle_enable_l(struct tegra_dc_hdmi_data *hdmi)
 
 static void hdmi_disable_l(struct tegra_dc_hdmi_data *hdmi)
 {
-	pr_info("NSJ hdmi_disable_l\n");
+	nsj_print_debug("NSJ hdmi_disable_l\n");
 #ifdef CONFIG_SWITCH
 	switch_set_state(&hdmi->audio_switch, 0);
 	pr_info("%s: audio_switch 0\n", __func__);
@@ -208,21 +208,13 @@ static void hdmi_disable_l(struct tegra_dc_hdmi_data *hdmi)
 	if (hdmi->dc->enabled) {
 		pr_info("HDMI from connected to disconnected\n");
 		hdmi->dc->connected = false;
-		if(!hdmi_reset) {
-			pr_info("NSJ hdmi_disable_l, tegra_dc_disable\n");
-			tegra_dc_disable(hdmi->dc);
-		}
+		tegra_dc_disable(hdmi->dc);
 #ifdef CONFIG_ADF_TEGRA
-		pr_info("NSJ hdmi_disable_l, tegra_adf_process_hotplug_disconnected\n");
 		tegra_adf_process_hotplug_disconnected(hdmi->dc->adf);
 #else
-		pr_info("NSJ hdmi_disable_l, tegra_fb_update_monspecs\n");
 		tegra_fb_update_monspecs(hdmi->dc->fb, NULL, NULL);
 #endif
-		if(!hdmi_reset) {
-			pr_info("NSJ hdmi_disable_l, tegra_dc_ext_process_hotplug\n");
-			tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
-		}
+		tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
 	}
 }
 
@@ -326,21 +318,19 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 #endif
 	hdmi->dc->connected = true;
 
-	pr_info("NSJ handle_check_edid_l, hdmi_reset=%d\n", hdmi_reset);
-	if(!hdmi_reset){
+	nsj_print_debug("NSJ handle_check_edid_l, hdmi_reset=%d\n", hdmi_reset);
 		tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
 
-		if (unlikely(tegra_is_clk_enabled(hdmi->clk))) {
-			/* the only time this should happen is on boot, where the
-			 * sequence is that hdmi is enabled before EDID is read.
-			 * hdmi_enable() doesn't have EDID information yet so can't
-			 * setup audio and infoframes, so we have to do so here.
-			 */
-			pr_info("%s: setting audio and infoframes\n", __func__);
-			tegra_dc_io_start(hdmi->dc);
-			tegra_dc_hdmi_setup_audio_and_infoframes(hdmi->dc);
-			tegra_dc_io_end(hdmi->dc);
-		}
+	if (unlikely(tegra_is_clk_enabled(hdmi->clk))) {
+		/* the only time this should happen is on boot, where the
+		 * sequence is that hdmi is enabled before EDID is read.
+		 * hdmi_enable() doesn't have EDID information yet so can't
+		 * setup audio and infoframes, so we have to do so here.
+		 */
+		pr_info("%s: setting audio and infoframes\n", __func__);
+		tegra_dc_io_start(hdmi->dc);
+		tegra_dc_hdmi_setup_audio_and_infoframes(hdmi->dc);
+		tegra_dc_io_end(hdmi->dc);
 	}
 	hdmi_state_machine_set_state_l(HDMI_STATE_DONE_ENABLED, 0);
 
@@ -354,7 +344,7 @@ end_disabled:
 
 static void handle_wait_for_hpd_reassert_l(struct tegra_dc_hdmi_data *hdmi)
 {
-	pr_info("NSJ handle_wait_for_hpd_reassert_l\n");
+	nsj_print_debug("NSJ handle_wait_for_hpd_reassert_l\n");
 	/* Looks like HPD dropped and really did stay low.  Go ahead and reset
 	 * the system.
 	 */
@@ -364,13 +354,13 @@ static void handle_wait_for_hpd_reassert_l(struct tegra_dc_hdmi_data *hdmi)
 void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
 {
 //	hdmi_reset = 1;
-	pr_info("NSJ hdmi_reset_l start\n");
+	nsj_print_debug("NSJ hdmi_reset_l start\n");
 	hdmi_disable_l(hdmi);
-	pr_info("NSJ hdmi_reset_l handle_check_edid_l\n");
+	nsj_print_debug("NSJ hdmi_reset_l handle_check_edid_l\n");
 	handle_check_edid_l(hdmi);
-	pr_info("NSJ hdmi_reset_l handle_enable_l\n");
+	nsj_print_debug("NSJ hdmi_reset_l handle_enable_l\n");
 	handle_enable_l(hdmi);
-	pr_info("NSJ hdmi_reset_l stop\n");
+	nsj_print_debug("NSJ hdmi_reset_l stop\n");
 //	hdmi_reset = 0;
 }
 
@@ -540,7 +530,7 @@ static void hdmi_state_machine_worker(struct work_struct *work)
  ************************************************************/
 void hdmi_state_machine_init(struct tegra_dc_hdmi_data *hdmi)
 {
-	pr_info("NSJ hdmi_state_machine_init\n");
+	nsj_print_debug("NSJ hdmi_state_machine_init\n");
 	work_state.hdmi = hdmi;
 	work_state.state = HDMI_STATE_INIT_FROM_BOOTLOADER;
 	work_state.pending_hpd_evt = 1;

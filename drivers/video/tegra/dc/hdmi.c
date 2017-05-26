@@ -1032,7 +1032,7 @@ static int tegra_dc_hdmi_init(struct tegra_dc *dc)
 		err = -ENOENT;
 		goto err_free_hdmi;
 	}
-	pr_info("NSJ tegra_dc_hdmi_init start\n");
+	nsj_print_debug("NSJ tegra_dc_hdmi_init start\n");
 	base_res = request_mem_region(res->start,
 		resource_size(res), dc->ndev->name);
 	if (!base_res) {
@@ -1206,7 +1206,7 @@ static int tegra_dc_hdmi_init(struct tegra_dc *dc)
 		goto err_gpio_free;
 	}
 
-	pr_info("NSJ tegra_dc_hdmi_init end\n");
+	nsj_print_debug("NSJ tegra_dc_hdmi_init end\n");
 	return 0;
 
 err_gpio_free:

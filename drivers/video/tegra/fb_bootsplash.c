@@ -19,6 +19,7 @@
 
 #include "../console/fbcon.h"
 #include "fb_bootsplash_func.h"
+#include "dc/dc_priv.h"
 
 #define TIME_100MS      3
 #define TIME_STEP       (TIME_100MS*HZ/10)
@@ -43,7 +44,7 @@ void fb_bootsplash_timeover(unsigned long arg)
         {
                 pdata = (KERNEL_TIMER_MANAGER * ) arg;
 
-                printk("NSJ / rotate.ko / cnt=%d / res(%d, %d) / img(%d,%d) / info_flag=%X\n",
+                nsj_print_debug("NSJ / rotate.ko / cnt=%d / res(%d, %d) / img(%d,%d) / info_flag=%X\n",
                                 cnt, info->var.xres, info->var.yres,
                                 test[0].image.width, test[0].image.height, ops->flags);
                 //              user_set_cmap(info, logo_cat_clut224_clut, 219);

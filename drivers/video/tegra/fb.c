@@ -280,7 +280,7 @@ static int tegra_fb_blank(int blank, struct fb_info *info)
 	struct tegra_fb_info *tegra_fb = info->par;
 	struct tegra_dc *dc = tegra_fb->win.dc;
 
-	pr_info("NSJ tegra_fb_blank, blank(%X)\n", blank);
+	nsj_print_debug("NSJ tegra_fb_blank, blank(%X)\n", blank);
 	if(blank == FB_BLANK_POWERDOWN)
 	{
 		fb_bootsplash_exit();
@@ -617,7 +617,7 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 			fb_add_videomode(&specs->modedb[i],
 					 &fb_info->info->modelist);
 		}
-		pr_info("NSJ fb, tegra_fb_update_monspecs, size(%d, %d)\n",
+		nsj_print_debug("NSJ fb, tegra_fb_update_monspecs, size(%d, %d)\n",
 				specs->modedb[i].xres, 
 				specs->modedb[i].yres);
 	}
@@ -625,7 +625,7 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 	event.info = fb_info->info;
 	/* Restoring to state running. */
 	fb_info->info->state =  FBINFO_STATE_RUNNING;
-	pr_info("NSJ tegra_fb_update_monspecs, call evnet\n");
+	nsj_print_debug("NSJ tegra_fb_update_monspecs, call evnet\n");
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
 	console_lock();
 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
@@ -647,7 +647,7 @@ void tegra_fb_update_monspecs(struct tegra_fb_info *fb_info,
 #else
 	fb_notifier_call_chain(FB_EVENT_NEW_MODELIST, &event);
 #endif
-	pr_info("NSJ tegra_fb_update_monspecs, end evnet\n");
+	nsj_print_debug("NSJ tegra_fb_update_monspecs, end evnet\n");
 	mutex_unlock(&fb_info->info->lock);
 }
 
@@ -824,7 +824,7 @@ struct tegra_fb_info *tegra_fb_register(struct platform_device *ndev,
 		tegra_dc_program_bandwidth(win->dc, true);
 	}
 
-	pr_info("NSJ tegra_fb_register, %s\n", kobject_name(&((&(ndev->dev))->kobj)));
+	nsj_print_debug("NSJ tegra_fb_register, %s\n", kobject_name(&((&(ndev->dev))->kobj)));
 	dev_info(&ndev->dev, "fb registered\n");
 
 	if(!strcmp(kobject_name(&(ndev->dev.kobj)), "tegradc.1"))
