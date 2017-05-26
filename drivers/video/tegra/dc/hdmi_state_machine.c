@@ -93,7 +93,6 @@ static const char * const state_names[] = {
 	"Recheck EDID",
 	"Takeover from bootloader",
 };
-static int hdmi_reset;
 
 static void hdmi_state_machine_set_state_l(int target_state, int resched_time)
 {
@@ -318,8 +317,7 @@ static void handle_check_edid_l(struct tegra_dc_hdmi_data *hdmi)
 #endif
 	hdmi->dc->connected = true;
 
-	nsj_print_debug("NSJ handle_check_edid_l, hdmi_reset=%d\n", hdmi_reset);
-		tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
+	tegra_dc_ext_process_hotplug(hdmi->dc->ndev->id);
 
 	if (unlikely(tegra_is_clk_enabled(hdmi->clk))) {
 		/* the only time this should happen is on boot, where the
@@ -353,7 +351,6 @@ static void handle_wait_for_hpd_reassert_l(struct tegra_dc_hdmi_data *hdmi)
 
 void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
 {
-//	hdmi_reset = 1;
 	nsj_print_debug("NSJ hdmi_reset_l start\n");
 	hdmi_disable_l(hdmi);
 	nsj_print_debug("NSJ hdmi_reset_l handle_check_edid_l\n");
@@ -361,7 +358,6 @@ void hdmi_reset_l(struct tegra_dc_hdmi_data *hdmi)
 	nsj_print_debug("NSJ hdmi_reset_l handle_enable_l\n");
 	handle_enable_l(hdmi);
 	nsj_print_debug("NSJ hdmi_reset_l stop\n");
-//	hdmi_reset = 0;
 }
 
 /* returns bytes read, or negative error */

@@ -54,13 +54,12 @@ static u8 nsj_debug;
 int nsj_print_debug(const char *fmt, ...)
 {
 	va_list args;
-
 	if(!nsj_debug)
 		return 0;
 	else
 	{
 		va_start(args, fmt);
-		printk(fmt, args);
+		vprintk(fmt, args);
 		va_end(args);
 		return 1;
 	}
@@ -74,7 +73,7 @@ static int __init nsj_debug_enable(char *str)
 
 	return 0;
 }
-__setup("nsj_debug=", nsj_debug_enable);
+__setup("nsj_debug", nsj_debug_enable);
 
 static ssize_t mode_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t count)

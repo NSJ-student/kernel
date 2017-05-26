@@ -3222,14 +3222,10 @@ static void fbcon_new_modelist(struct fb_info *info)
 		if (!fb_display[i].mode)
 			continue;
 		vc = vc_cons[i].d;
-		pr_info("NSJ fbcon_new_modelist, display_to_var\n");
 		display_to_var(&var, &fb_display[i]);
-		pr_info("NSJ fbcon_new_modelist, fb_find_nearest_mode\n");
 		mode = fb_find_nearest_mode(fb_display[i].mode,
 					    &info->modelist);
-		pr_info("NSJ fbcon_new_modelist, fb_videomode_to_var\n");
 		fb_videomode_to_var(&var, mode);
-		pr_info("NSJ fbcon_new_modelist, fbcon_set_disp\n");
 		fbcon_set_disp(info, &var, vc->vc_num);
 	}
 }
@@ -3341,7 +3337,6 @@ static int fbcon_event_notify(struct notifier_block *self,
 		break;
 	}
 done:
-	pr_info("NSJ fbcon_event_notify, end\n");
 	return ret;
 }
 
