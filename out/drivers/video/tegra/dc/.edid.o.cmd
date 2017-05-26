@@ -5,24 +5,15 @@ source_drivers/video/tegra/dc/edid.o := /home/ubuntu/kernel/drivers/video/tegra/
 deps_drivers/video/tegra/dc/edid.o := \
     $(wildcard include/config/debug/fs.h) \
     $(wildcard include/config/tegra/hdmi/74mhz/limit.h) \
-  /home/ubuntu/kernel/include/linux/debugfs.h \
-  /home/ubuntu/kernel/include/linux/fs.h \
-    $(wildcard include/config/sysfs.h) \
-    $(wildcard include/config/smp.h) \
-    $(wildcard include/config/fs/posix/acl.h) \
-    $(wildcard include/config/security.h) \
-    $(wildcard include/config/quota.h) \
-    $(wildcard include/config/fsnotify.h) \
-    $(wildcard include/config/ima.h) \
-    $(wildcard include/config/preempt.h) \
-    $(wildcard include/config/epoll.h) \
-    $(wildcard include/config/debug/writecount.h) \
-    $(wildcard include/config/file/locking.h) \
-    $(wildcard include/config/debug/lock/alloc.h) \
-    $(wildcard include/config/auditsyscall.h) \
-    $(wildcard include/config/block.h) \
-    $(wildcard include/config/fs/xip.h) \
-    $(wildcard include/config/migration.h) \
+  /home/ubuntu/kernel/include/linux/kernel.h \
+    $(wildcard include/config/lbdaf.h) \
+    $(wildcard include/config/preempt/voluntary.h) \
+    $(wildcard include/config/debug/atomic/sleep.h) \
+    $(wildcard include/config/prove/locking.h) \
+    $(wildcard include/config/ring/buffer.h) \
+    $(wildcard include/config/tracing.h) \
+    $(wildcard include/config/ftrace/mcount/record.h) \
+  /usr/lib/gcc/arm-linux-gnueabihf/4.8/include/stdarg.h \
   /home/ubuntu/kernel/include/linux/linkage.h \
   /home/ubuntu/kernel/include/linux/compiler.h \
     $(wildcard include/config/sparse/rcu/pointer.h) \
@@ -43,13 +34,10 @@ deps_drivers/video/tegra/dc/edid.o := \
     $(wildcard include/config/modversions.h) \
     $(wildcard include/config/unused/symbols.h) \
   /home/ubuntu/kernel/arch/arm/include/asm/linkage.h \
-  /home/ubuntu/kernel/include/linux/wait.h \
-    $(wildcard include/config/lockdep.h) \
-  /home/ubuntu/kernel/include/linux/list.h \
-    $(wildcard include/config/debug/list.h) \
+  /home/ubuntu/kernel/include/linux/stddef.h \
+  /home/ubuntu/kernel/include/uapi/linux/stddef.h \
   /home/ubuntu/kernel/include/linux/types.h \
     $(wildcard include/config/uid16.h) \
-    $(wildcard include/config/lbdaf.h) \
     $(wildcard include/config/arch/dma/addr/t/64bit.h) \
     $(wildcard include/config/phys/addr/t/64bit.h) \
     $(wildcard include/config/64bit.h) \
@@ -62,51 +50,17 @@ deps_drivers/video/tegra/dc/edid.o := \
   /home/ubuntu/kernel/include/asm-generic/bitsperlong.h \
   /home/ubuntu/kernel/include/uapi/asm-generic/bitsperlong.h \
   /home/ubuntu/kernel/include/uapi/linux/posix_types.h \
-  /home/ubuntu/kernel/include/linux/stddef.h \
-  /home/ubuntu/kernel/include/uapi/linux/stddef.h \
   /home/ubuntu/kernel/arch/arm/include/uapi/asm/posix_types.h \
   /home/ubuntu/kernel/include/uapi/asm-generic/posix_types.h \
-  /home/ubuntu/kernel/include/linux/poison.h \
-    $(wildcard include/config/illegal/pointer/value.h) \
-  /home/ubuntu/kernel/include/uapi/linux/const.h \
-  /home/ubuntu/kernel/include/linux/spinlock.h \
-    $(wildcard include/config/debug/spinlock.h) \
-    $(wildcard include/config/generic/lockbreak.h) \
-  /home/ubuntu/kernel/include/linux/typecheck.h \
-  /home/ubuntu/kernel/include/linux/preempt.h \
-    $(wildcard include/config/debug/preempt.h) \
-    $(wildcard include/config/preempt/tracer.h) \
-    $(wildcard include/config/context/tracking.h) \
-    $(wildcard include/config/preempt/count.h) \
-    $(wildcard include/config/preempt/notifiers.h) \
-  arch/arm/include/generated/asm/preempt.h \
-  /home/ubuntu/kernel/include/asm-generic/preempt.h \
-  /home/ubuntu/kernel/include/linux/thread_info.h \
-    $(wildcard include/config/compat.h) \
-    $(wildcard include/config/debug/stack/usage.h) \
-  /home/ubuntu/kernel/include/linux/bug.h \
-    $(wildcard include/config/generic/bug.h) \
-  /home/ubuntu/kernel/arch/arm/include/asm/bug.h \
-    $(wildcard include/config/bug.h) \
-    $(wildcard include/config/thumb2/kernel.h) \
-    $(wildcard include/config/debug/bugverbose.h) \
-    $(wildcard include/config/arm/lpae.h) \
-  /home/ubuntu/kernel/include/asm-generic/bug.h \
-    $(wildcard include/config/generic/bug/relative/pointers.h) \
-  /home/ubuntu/kernel/include/linux/kernel.h \
-    $(wildcard include/config/preempt/voluntary.h) \
-    $(wildcard include/config/debug/atomic/sleep.h) \
-    $(wildcard include/config/prove/locking.h) \
-    $(wildcard include/config/ring/buffer.h) \
-    $(wildcard include/config/tracing.h) \
-    $(wildcard include/config/ftrace/mcount/record.h) \
-  /usr/lib/gcc/arm-linux-gnueabihf/4.8/include/stdarg.h \
   /home/ubuntu/kernel/include/linux/bitops.h \
   /home/ubuntu/kernel/arch/arm/include/asm/bitops.h \
+    $(wildcard include/config/smp.h) \
   /home/ubuntu/kernel/include/linux/irqflags.h \
     $(wildcard include/config/trace/irqflags.h) \
     $(wildcard include/config/irqsoff/tracer.h) \
+    $(wildcard include/config/preempt/tracer.h) \
     $(wildcard include/config/trace/irqflags/support.h) \
+  /home/ubuntu/kernel/include/linux/typecheck.h \
   /home/ubuntu/kernel/arch/arm/include/asm/irqflags.h \
   /home/ubuntu/kernel/arch/arm/include/asm/ptrace.h \
     $(wildcard include/config/arm/thumb.h) \
@@ -146,6 +100,52 @@ deps_drivers/video/tegra/dc/edid.o := \
   /home/ubuntu/kernel/include/uapi/linux/sysinfo.h \
   /home/ubuntu/kernel/arch/arm/include/asm/div64.h \
   /home/ubuntu/kernel/arch/arm/include/asm/compiler.h \
+  /home/ubuntu/kernel/arch/arm/include/asm/bug.h \
+    $(wildcard include/config/bug.h) \
+    $(wildcard include/config/thumb2/kernel.h) \
+    $(wildcard include/config/debug/bugverbose.h) \
+    $(wildcard include/config/arm/lpae.h) \
+  /home/ubuntu/kernel/include/asm-generic/bug.h \
+    $(wildcard include/config/generic/bug.h) \
+    $(wildcard include/config/generic/bug/relative/pointers.h) \
+  /home/ubuntu/kernel/include/linux/debugfs.h \
+  /home/ubuntu/kernel/include/linux/fs.h \
+    $(wildcard include/config/sysfs.h) \
+    $(wildcard include/config/fs/posix/acl.h) \
+    $(wildcard include/config/security.h) \
+    $(wildcard include/config/quota.h) \
+    $(wildcard include/config/fsnotify.h) \
+    $(wildcard include/config/ima.h) \
+    $(wildcard include/config/preempt.h) \
+    $(wildcard include/config/epoll.h) \
+    $(wildcard include/config/debug/writecount.h) \
+    $(wildcard include/config/file/locking.h) \
+    $(wildcard include/config/debug/lock/alloc.h) \
+    $(wildcard include/config/auditsyscall.h) \
+    $(wildcard include/config/block.h) \
+    $(wildcard include/config/fs/xip.h) \
+    $(wildcard include/config/migration.h) \
+  /home/ubuntu/kernel/include/linux/wait.h \
+    $(wildcard include/config/lockdep.h) \
+  /home/ubuntu/kernel/include/linux/list.h \
+    $(wildcard include/config/debug/list.h) \
+  /home/ubuntu/kernel/include/linux/poison.h \
+    $(wildcard include/config/illegal/pointer/value.h) \
+  /home/ubuntu/kernel/include/uapi/linux/const.h \
+  /home/ubuntu/kernel/include/linux/spinlock.h \
+    $(wildcard include/config/debug/spinlock.h) \
+    $(wildcard include/config/generic/lockbreak.h) \
+  /home/ubuntu/kernel/include/linux/preempt.h \
+    $(wildcard include/config/debug/preempt.h) \
+    $(wildcard include/config/context/tracking.h) \
+    $(wildcard include/config/preempt/count.h) \
+    $(wildcard include/config/preempt/notifiers.h) \
+  arch/arm/include/generated/asm/preempt.h \
+  /home/ubuntu/kernel/include/asm-generic/preempt.h \
+  /home/ubuntu/kernel/include/linux/thread_info.h \
+    $(wildcard include/config/compat.h) \
+    $(wildcard include/config/debug/stack/usage.h) \
+  /home/ubuntu/kernel/include/linux/bug.h \
   /home/ubuntu/kernel/arch/arm/include/asm/relaxed.h \
   /home/ubuntu/kernel/include/asm-generic/relaxed.h \
   /home/ubuntu/kernel/arch/arm/include/asm/thread_info.h \
